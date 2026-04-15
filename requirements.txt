@@ -1,0 +1,8 @@
+pandas
+numpy
+scipy
+matplotlib
+statsmodels
+openpyxl
+fpdf2
+tqdm

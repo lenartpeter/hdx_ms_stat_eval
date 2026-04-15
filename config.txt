@@ -1,0 +1,366 @@
+# ============================================================================
+# HDX-MS EQUIVALENCE TESTING - CONFIGURATION FILE
+# ============================================================================
+#
+# This configuration file controls the main aspects of the HDX-MS statistical 
+# evaluation analysis pipeline for establishing deterministic acceptance limits.
+#
+# INSTRUCTIONS:
+# - Lines starting with # are comments and are ignored
+# - Do not use quotes around file paths
+# - Leave a value empty to disable that option
+#
+# ============================================================================
+
+
+# ============================================================================
+# PROTEIN EVALUATION SECTIONS
+# ============================================================================
+# Each protein to evaluate gets its own section: [PROTEIN_TO_EVALUATE_N]
+# where N is a number (1, 2, 3, ...). You can add as many as needed.
+#
+# Each one requires:
+#
+# display_name: A short name shown in output (e.g., "Infliximab", "NIST_mAb")
+#
+# null_experiment: Path to replicate data file for establishing limits
+#   This file must have columns with the following names:
+#   Sequence, Replicate number, HX time, Uptake (Da)
+#   Set the number of replicates (e.g. 8) for "n_replicates" below at [STATISTICAL_PARAMETERS].
+#
+# reference: Path to reference protein data (aggregated format)
+#   This file must have columns with the following names:
+#   Protein state, Sequence, HX time, Uptake (Da), Uptake SD (Da), Replicate number
+#   Note that this file has to contain AVERAGED data,  therefore Replicate number here is typically 3 here.
+#
+# candidate_N: Add "candidate_1" (and then candidate_2, etc, if you have more) 
+#   and set the file path for its data file.
+#   This file must have columns with the following names:
+#   Protein state, Sequence, HX time, Uptake (Da), Uptake SD (Da), Replicate number
+#
+# The system automatically detects all numbered candidates for each protein.
+# ============================================================================
+
+[PROTEIN_TO_EVALUATE_1]
+display_name = Infliximab
+null_experiment = # Add the file path here and remove the hashtag symbols in this row
+reference = # Add the file path here and remove the hashtag symbols in this row
+candidate_1 = # Add the file path here and remove the hashtag symbols in this row
+#candidate_2 = # Add the file path here and remove the hashtag symbols in this row, if you have a second candidate as well
+#candidate_3 = # Add the file path here and remove the hashtag symbols in this row, if you have a third candidate as well
+
+#[PROTEIN_TO_EVALUATE_2] #remove hashtag at the beginning of this row if you want to evaluate a second protein
+#display_name = #remove hashtag at the beginning of this row and add the file path here if you want to evaluate a second protein
+#null_experiment = #remove hashtag at the beginning of this row and add the file path here if you want to evaluate a second protein
+#reference = #remove hashtag at the beginning of this row and add the file path here if you want to evaluate a second protein
+#candidate_1 = #remove hashtag at the beginning of this row and add the file path here if you want to evaluate a second protein
+
+# ============================================================================
+# [STATISTICAL_PARAMETERS]
+# ============================================================================
+# These parameters control the statistical calculations used throughout
+# the analysis pipeline.
+#
+# ALPHA (Family-wise significance level):
+#   The overall significance level for the equivalence test.
+#   This value is used with Sidak correction for multiple testing.
+#
+# ALPHA_CI:
+#   The significance level used for calculating confidence intervals.
+#   A value of 0.10 produces 90% confidence intervals.
+#
+# ALPHA_SIGNIFICANCE_TEST:
+#   The significance level used for the hybrid HX significance test and
+#   volcano plot threshold line.
+#
+# GROUP_SIZE:
+#   Number of replicates per group when comparing reference vs sample.
+#   Changing this affects the number of possible pairings.
+#
+# N_REPLICATES:
+#   Total number of replicates in the null experiment data.
+#   The number of non-overlapping pairings is calculated as:
+#   C(n_replicates, group_size) × C(n_replicates - group_size, group_size) / 2
+#   For n_replicates=8 and group_size=3, this yields 280 pairings.
+#
+# N_SIMULATIONS (Monte Carlo):
+#   Number of Monte Carlo simulations to run.
+#
+# dD and EAC (Monte Carlo):
+#   Optional external thresholds for Monte Carlo pass-rate reporting.
+#   If BOTH are set, the Monte Carlo output will additionally report
+#   how many simulated experiments pass both criteria together:
+#   dD_max < dD AND max(abs(CI_LP_UP_max)) < EAC.
+#   Leave empty to disable this extra reporting.
+# ============================================================================
+
+[STATISTICAL_PARAMETERS]
+alpha = 0.05
+alpha_ci = 0.10
+alpha_significance_test = 0.01
+group_size = 3
+n_replicates = 8
+n_simulations = 100000000
+
+dD =
+EAC = 
+
+# ============================================================================
+# [PRECOMPUTATION]
+# ============================================================================
+# Settings for the precomputation of the statistics dataset.
+#
+# The precomputed file contains all possible delta_D, CI, and SE values
+# for every combination of peptide, labeling time, and replicate pairing.
+# Total records = n_times × n_peptides × n_pairings
+# (e.g., 6 × 187 × 280 = 314,160)
+#
+# FORCE_RECOMPUTE:
+#   If true, the precomputed file will be created again, even if it already exists.
+#   If false, the existing file is used if settings match.
+# ============================================================================
+
+[PRECOMPUTATION]
+precomputed_folder = ./precomputed
+force_recompute = true
+
+
+# ============================================================================
+# [OUTLIER_DETECTION]
+# ============================================================================
+# Outlier detection can be applied at two stages:
+#
+# STAGE 0 (Uptake Range filtering):
+#   Applied BEFORE precomputation. Filters a peptide-labeling time
+#   combination based on the range of uptake values across all replicates.
+#
+# STAGE 1 (Individual Replicate Filtering):
+#   Applied to identify outlier replicates WITHIN each peptide-labeling time
+#   combination. Outlier replicates can be removed, reducing the available
+#   replicates for that specific peptide-labeling time combination (e.g., from 8 to 7 or fewer).
+# Note: Please do not evaluate data with other methods after applying Stage 1 filtering, 
+# as Pairing_ID values may become inconsistent!
+#
+# AVAILABLE METHODS:
+#   boxplot: Standard IQR method (Q1 - k*IQR, Q3 + k*IQR), default k=1.5
+#   adjusted_boxplot: Accounts for skewness using medcouple, default k=1.5
+#   hampel: Median + MAD based, default cutoff=3.5
+#
+# REMOVE_MODE (this setting is for Stage 1 only):
+#   none: Detect but do not remove outliers
+#   single_only: Remove only if exactly 1 outlier detected
+#   up_to_two: Remove up to 2 outliers if detected
+# ============================================================================
+
+[OUTLIER_DETECTION]
+stage0_enabled = false
+stage0_method = adjusted_boxplot
+stage0_cutoff = 1.5
+
+stage1_enabled = false
+stage1_method = boxplot
+stage1_cutoff = 1.5
+stage1_remove_mode = single_only
+# Note: Please do not evaluate data with other methods after applying Stage 1 
+# filtering, as Pairing_ID values may become inconsistent!
+
+# VERBOSE:
+#   true: Print detailed outlier detection results (every detection)
+#   false: Print only summary statistics
+verbose = true
+
+# ============================================================================
+# [ANALYSIS_OPTIONS]
+# ============================================================================
+# Select which analysis methods to run. Set to true to enable, false to skip.
+#
+# RESAMPLING:
+#   The original randomized resampling approach from Hageman et al. (Hageman, T. S.; Wrigley, M. S.; Weis, D. D. Statistical Equivalence 
+#   Testing of Higher-Order Protein Structures with Differential Hydrogen Exchange-Mass Spectrometry (HX-MS). 
+#   Anal. Chem. 2021, 93 (18), 6980–6988. https://doi.org/10.1021/acs.analchem.0c05279.)
+#   Mode A: Same pairing for all labeling times
+#   Mode B: Different pairing per labeling times
+#
+# MONTE_CARLO:
+#   Monte Carlo resampling simulation.
+#
+# DIRECT_PERCENTILE:
+#   Deterministic method that calculates acceptance limits directly from
+#   the precomputed values using Sidak-corrected percentiles.
+#
+# PARTITIONED_LIMITS:
+#   Calculates partitioned acceptance limits based on labeling time,
+#   peptide length, or standard error.
+#
+# EVALUATION_METHOD:
+#   Options for evaluation:
+#   complete_enumeration, direct_percentile, monte_carlo, partitioned_limits, resampling
+# ============================================================================
+
+[ANALYSIS_OPTIONS]
+resampling_n_simulations = 5
+resampling_mode = B
+resampling_n_rounds = 1
+
+#set these true to run a method and display the calculated limit
+run_complete_enumeration = true
+run_monte_carlo = false
+run_direct_percentile = true
+run_resampling = false
+run_partitioned_limits = false
+run_significance_test = false
+
+
+#set this to true if you want to evaluate test samples with the calculated limits, 
+#then choose one or more method to evaluate with and see its results
+run_evaluation = true
+
+evaluation_method = complete_enumeration, direct_percentile
+
+
+# ============================================================================
+# [PARTITIONED_LIMITS]
+# ============================================================================
+# Configure how acceptance limits are partitioned (stratified). The precomputed data will be partitioned.
+#
+# PARTITIONING_OPTIONS:
+#   labeling_time: A separate limit is calculated for each labeling time (number of groups is 
+#   specified by number of labeling times)
+#   peptide_length: A separate limit is calculated for peptide groups, peptides are 
+#   grouped by their amino acid length (the partition width has to be specified)
+#   se: Group by standard error values (the number of partitions has to be specified)
+#
+# PEPTIDE_LENGTH_PARTITION_SIZES:
+#   Width of each partition in amino acids. If multiple values are set, multiple analyses will be done.
+#
+# SE_N_PARTITIONS:
+#   Number of equal-width SE partitions. If multiple values are set, multiple analyses will be done.
+# ============================================================================
+
+[PARTITIONED_LIMITS]
+#Opt 1
+stratify_by_labeling_time = false
+#Opt 2
+stratify_by_peptide_length = false
+peptide_length_partition_sizes = 
+#Opt 3
+stratify_by_se = false
+se_n_partitions = 
+
+# ============================================================================
+# [OUTPUT_SETTINGS]
+# ============================================================================
+# Configure where and how results are saved.
+#
+# FIGURE_FORMAT:
+#   Output format for generated figures. Options:
+#   - tiff: Lossless raster format (default)
+#   - png: Compressed raster format, smaller file size
+#   - pdf: Vector format, scalable
+# ============================================================================
+
+[OUTPUT_SETTINGS]
+output_directory = ./outputs 
+#this automatically creates a folder named outputs in the evaluation folder, change if you wish
+
+generate_hageman_plots = true 
+generate_complete_enumeration_plot = true 
+generate_percentile_figures = true 
+generate_uptake_range_figure = true
+figure_format = tiff
+save_plots = true
+
+save_excel_reports = true
+save_csv_results = true
+
+save_resampling_results = true
+save_complete_enumeration_data = true
+generate_volcano_plots = true
+save_significance_results = true
+
+
+# ============================================================================
+# [FIGURE_SETTINGS]
+# ============================================================================
+# Configure sizes and fonts for all generated figures.
+# Figure sizes are in inches (1 inch = 2.54 cm).
+# Font sizes are in points.
+#
+# exact_figsize: If true, saves figures at exact specified dimensions
+#                If false (default), uses tight bounding box (may crop whitespace)
+# ============================================================================
+
+[FIGURE_SETTINGS]
+# Use exact figure size (no cropping/tight bbox)
+exact_figsize = true
+
+# Uptake Range Plot 
+uptake_range_width_inch = 4.996
+uptake_range_height_inch = 2.508
+uptake_range_axis_title_fontsize = 8.4
+uptake_range_axis_number_fontsize = 7.2
+uptake_range_dot_size = 3
+
+# Direct Percentile Figures 
+direct_percentile_width_inch = 5.7
+direct_percentile_height_inch = 2.46
+direct_percentile_axis_title_fontsize = 8.05
+direct_percentile_axis_number_fontsize = 7
+
+# Resampling Figures 
+resampling_width_inch = 11.4
+resampling_height_inch = 3
+resampling_axis_title_fontsize = 12
+resampling_axis_number_fontsize = 10
+resampling_result_text_fontsize = 11
+resampling_dot_size = 3
+resampling_ci_line_width = 0.5
+resampling_limit_line_width = 1.5
+volcano_width_inch = 2.6
+volcano_height_inch = 2.3
+volcano_axis_title_fontsize = 6
+volcano_axis_number_fontsize = 6
+volcano_dot_size = 3
+volcano_xmin = -0.7
+volcano_xmax = 0.7
+volcano_ymin = 0.000019
+volcano_ymax = 1
+volcano_auxiliary_vertical_line =
+
+# DPI Settings (dots per inch) for each figure type
+uptake_range_dpi = 300
+direct_percentile_dpi = 300
+resampling_dpi = 300
+volcano_dpi = 300
+
+
+# ============================================================================
+# [ADVANCED]
+# ============================================================================
+# Advanced settings for experienced users.
+#
+# RANDOM_SEED (Monte Carlo):
+#   Used for debugging, please do not change assign a value to it unless you know what you are doing. 
+#   Set a specific random seed to always obtain the same Monte Carlo results.
+#
+# BATCH_SIZE (Monte Carlo):
+#   Number of simulations processed per batch in Monte Carlo, affect calculation speed.
+#
+# VERBOSE:
+#   true: Print detailed progress and statistics
+#   false: Print only essential information and errors
+#
+# ROUND_REPORTED_LIMITS:
+#   true: Report final EAC and |ΔD|_limit values rounded to 3 decimals
+#   false: Report those final values with 4 decimals instead
+# ============================================================================
+
+[ADVANCED]
+random_seed = 
+#Used for debugging, please do not assign a value to it unless you know what you are doing.
+
+batch_size = 100000
+verbose = true
+round_reported_limits = true
+
+# END 
