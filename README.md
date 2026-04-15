@@ -1,16 +1,7 @@
-This repository contains the Python codebase that accompanies a manuscript currently under review.  
-Full citation details will be added after publication. 
-
-Authors:
-> Péter Lénárt<sup>1,2,3</sup>, Viktor Háda<sup>3</sup>, Kinga Komka<sup>4</sup>, \*Gergely Tóth<sup>5</sup>, \*Gitta Schlosser<sup>1</sup>
-
-**Affiliations:**
-
-1. MTA-ELTE Lendület (Momentum) Ion Mobility Mass Spectrometry Research Group and Department of Analytical Chemistry, Institute of Chemistry, ELTE Eötvös Loránd University, Pázmány Péter sétány 1/A, H-1117 Budapest, Hungary
-2. Hevesy György PhD School of Chemistry, ELTE Eötvös Loránd University, Pázmány Péter sétány 1/A, H-1117 Budapest, Hungary
-3. Structural Characterization, Biotechnology Process Development & Analytics, Biotechnology Business Unit, Gedeon Richter Plc., Gyömrői út 19-21., 1103, Budapest, Hungary
-4. Department of Chemical and Environmental Process Engineering, Faculty of Chemical Technology and Biotechnology, Budapest University of Technology and Economics, Műegyetem rkp. 3., 1111, Budapest, Hungary
-5. Institute of Chemistry, Eötvös Loránd University, Pázmány Péter sétány 1/A, H-1117, Budapest, Hungary
+This repository contains the Python codebase that accompanies the following article:  
+Péter Lénárt<sup>1,2,3</sup>, Viktor Háda<sup>3</sup>, Kinga Komka<sup>4</sup>, \*Gergely Tóth<sup>5</sup>, \*Gitta Schlosser<sup>1</sup>
+[**Deterministic Acceptance Limits for Statistical Equivalence Testing in Hydrogen/Deuterium Exchange Mass Spectrometry**]
+*Journal of the American Society for Mass Spectrometry*, 2026, (https://doi.org/10.1021/jasms.6c00035)
 
 ---
 
@@ -19,7 +10,6 @@ The codebase currently offers Windows compatibility and was tested with Microsof
 
 1. Download the latest version of Python from <https://www.python.org/downloads>. We recommend using the standalone installer. During installation, check **"Add python.exe to PATH"**. The development was done using Python version 3.8.16 and verified compatible with Python 3.14.3.
     <img width="752" height="332" alt="Picture1" src="https://github.com/user-attachments/assets/e683e5d4-81e3-490b-9588-3c791f21d502" />
-    <img width="643" height="397" alt="Picture2" src="https://github.com/user-attachments/assets/4e1af259-faba-42be-b07b-ca749e81b1f3" />
 
 
 2. Download the repository by clicking the green "**Code**" button and selecting "**Download ZIP**". Extract the downloaded `.zip` folder and move its contents into a folder that will be used for evaluation, e.g.:
@@ -76,6 +66,8 @@ The codebase currently offers Windows compatibility and was tested with Microsof
    ```
 
    You will see a long list of packages being downloaded and installed. This process will take a few seconds.
+   Development was done using: pandas v1.1.3, numpy v1.24.3, scipy v1.5.4, matplotlib v3.2.2, statsmodels v0.14.1,
+   openpyxl v3.1.5, fpdf2 v2.8.3, tqdm v4.67.1
 
 ---
 
