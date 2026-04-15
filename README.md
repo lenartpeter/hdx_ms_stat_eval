@@ -1,7 +1,8 @@
 This repository contains the Python codebase that accompanies the following article:  
+
 Péter Lénárt<sup>1,2,3</sup>, Viktor Háda<sup>3</sup>, Kinga Komka<sup>4</sup>, \*Gergely Tóth<sup>5</sup>, \*Gitta Schlosser<sup>1</sup>
-[**Deterministic Acceptance Limits for Statistical Equivalence Testing in Hydrogen/Deuterium Exchange Mass Spectrometry**]
-*Journal of the American Society for Mass Spectrometry*, 2026, (https://doi.org/10.1021/jasms.6c00035)
+**Deterministic Acceptance Limits for Statistical Equivalence Testing in Hydrogen/Deuterium Exchange Mass Spectrometry**
+Journal of the American Society for Mass Spectrometry, 2026, https://doi.org/10.1021/jasms.6c00035
 
 ---
 
